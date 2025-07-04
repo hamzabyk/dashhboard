@@ -99,6 +99,9 @@ app.index_string = '''
     </body>
 </html>
 '''
+if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 8050))
+    app.run_server(host='0.0.0.0', port=port, debug=False)
 
 # Placeholder for the rest of the app layout and callbacks
 
