@@ -1,4 +1,3 @@
-
 # Kurumsal BIST 100 Dashboard
 # - Mobil ve masaüstü destekli responsive tasarım
 # - RSI, MACD, hacim ve fiyat grafikleri
@@ -9,7 +8,7 @@
 import dash
 from dash import dcc, html, Input, Output
 import dash_bootstrap_components as dbc
-import dash_table
+from dash import dash_table
 import yfinance as yf
 import pandas as pd
 import plotly.graph_objs as go
@@ -99,9 +98,8 @@ app.index_string = '''
     </body>
 </html>
 '''
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 8050))
-    app.run_server(host='0.0.0.0', port=port, debug=False)
-
-# Placeholder for the rest of the app layout and callbacks
+    app.run(host='0.0.0.0', port=port, debug=False)
 
