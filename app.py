@@ -30,13 +30,7 @@ app.layout = html.Div([
     html.Div([
         dbc.Switch(id="theme-toggle", label="Koyu Tema", value=True, className="form-check form-switch text-light")
     ], style={"position": "fixed", "top": "10px", "right": "20px", "zIndex": 9999}),
-    
-    html.Div([
-        html.H4("BIST 100 (Mobil Kart Görünümü)", className="text-light mt-4"),
-        html.Div(id="mobile-cards-container")
-    ], style={"display": "none"}, id="mobile-view-container")
-])
-
+    html.Div(id="page-content")
 ])
 
 # Tema değiştirme callback
@@ -69,7 +63,7 @@ def render_mobile_cards(data):
                     html.H5(f"{row['Sembol']}", className="card-title"),
                     html.P(row['Şirket'], className="card-text small"),
                     html.P(f"Fiyat: {row['Fiyat']} TL", className="mb-1"),
-                    html.P(f"Değişim: {float(row['Değişim %']):+.2f}%", className="mb-0")
+                    html.P(f"Değişim: {float(row['Değişim %']):+.2f}%%", className="mb-0")
                 ])
             ], color="dark", outline=True, className="mb-3")
         )
