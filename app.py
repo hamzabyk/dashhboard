@@ -22,6 +22,7 @@ external_stylesheets = {
 }
 
 app = dash.Dash(__name__, external_stylesheets=[external_stylesheets['dark']], suppress_callback_exceptions=True)
+server = app.server
 app.title = "Kurumsal BIST 100 Dashboard"
 
 # Global theme toggle state (default dark)
