@@ -17,22 +17,45 @@ app = dash.Dash(__name__, external_stylesheets=[external_stylesheets['dark']], s
 server = app.server
 app.title = "Kurumsal BIST 100 Dashboard"
 
+# Örnek veri çekme (ilk yüklemede)
+def fetch_sample_data():
+    hisseler = {
+        "ASELS.IS": "Aselsan",
+        "THYAO.IS": "Türk Hava Yolları",
+        "SISE.IS": "Şişecam"
+    }
+    rows = []
+    for sembol, isim in hisseler.items():
+        try:
+            data = yf.Ticker(sembol).history(period="1d")
+            fiyat = round(data['Close'][-1], 2)
+            önceki = round(data['Close'][-2], 2)
+            değişim = ((fiyat - önceki) / önceki) * 100
+            rows.append({
+                "Sembol": sembol.split(".")[0],
+                "Şirket": isim,
+                "Fiyat": fiyat,
+                "Değişim %": round(değişim, 2)
+            })
+        except:
+            continue
+    return rows
+
+initial_data = fetch_sample_data()
+
 app.layout = html.Div([
     dcc.Store(id="theme-store", data="dark"),
 
-    # Tema geçiş düğmesi
     html.Div([
         dbc.Switch(id="theme-toggle", label="Koyu Tema", value=True,
                    className="form-check form-switch text-light")
     ], style={"position": "fixed", "top": "10px", "right": "20px", "zIndex": 9999}),
 
-    # Mobil kart görünümü
     html.Div([
         html.H4("BIST 100 (Mobil Kart Görünümü)", className="text-light mt-4"),
         html.Div(id="mobile-cards-container")
     ], style={"display": "none"}, id="mobile-view-container"),
 
-    # Görünmeyen tablo (mobil kartlara veri kaynağı sağlıyor)
     dash_table.DataTable(
         id='overview-table',
         columns=[
@@ -41,12 +64,11 @@ app.layout = html.Div([
             {'name': 'Fiyat', 'id': 'Fiyat'},
             {'name': 'Değişim %', 'id': 'Değişim %'}
         ],
-        data=[],  # Başlangıçta boş, ileride callback ile doldurulur
+        data=initial_data,
         style_table={'display': 'none'}
     )
 ])
 
-# Tema toggle callback
 @app.callback(
     Output("theme-store", "data"),
     Input("theme-toggle", "value")
@@ -54,7 +76,6 @@ app.layout = html.Div([
 def toggle_theme(value):
     return "dark" if value else "light"
 
-# Mobil kart görünümü üretme
 @app.callback(
     Output("mobile-cards-container", "children"),
     Input("overview-table", "data")
@@ -77,7 +98,6 @@ def render_mobile_cards(data):
         )
     return cards
 
-# Özel index_string ile responsive görünüm
 app.index_string = '''
 <!DOCTYPE html>
 <html>
@@ -110,7 +130,3 @@ app.index_string = '''
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 8050))
     app.run(host="0.0.0.0", port=port, debug=False)
-
-
-
-
