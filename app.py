@@ -30,7 +30,10 @@ app.layout = html.Div([
     html.Div([
         dbc.Switch(id="theme-toggle", label="Koyu Tema", value=True, className="form-check form-switch text-light")
     ], style={"position": "fixed", "top": "10px", "right": "20px", "zIndex": 9999}),
-    html.Div(id="page-content")
+    html.Div([
+        html.H4("BIST 100 (Mobil Kart Görünümü)", className="text-light mt-4"),
+        html.Div(id="mobile-cards-container")
+    ], style={"display": "none"}, id="mobile-view-container")
 ])
 
 # Tema değiştirme callback
@@ -42,10 +45,7 @@ def toggle_theme(value):
     return "dark" if value else "light"
 
 # Mobil kart görünümü sadece küçük ekranlarda görünür
-app.layout.children.append(html.Div([
-    html.H4("BIST 100 (Mobil Kart Görünümü)", className="text-light mt-4"),
-    html.Div(id="mobile-cards-container")
-], style={"display": "none"}, id="mobile-view-container"))
+
 
 @app.callback(
     Output("mobile-cards-container", "children"),
