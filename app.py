@@ -1,10 +1,3 @@
-# Kurumsal BIST 100 Dashboard
-# - Mobil ve masaüstü destekli responsive tasarım
-# - RSI, MACD, hacim ve fiyat grafikleri
-# - Çoklu hisse karşılaştırma (% performans)
-# - Tooltip açıklamalar ve koyu tema geçişi
-# - Takvim filtresi ve mobil kart görünümü dahil
-
 import dash
 from dash import dcc, html, Input, Output
 import dash_bootstrap_components as dbc
@@ -15,7 +8,6 @@ import plotly.graph_objs as go
 import plotly.express as px
 import os
 
-# Tema kontrolü
 external_stylesheets = {
     'dark': dbc.themes.CYBORG,
     'light': dbc.themes.FLATLY
@@ -25,19 +17,36 @@ app = dash.Dash(__name__, external_stylesheets=[external_stylesheets['dark']], s
 server = app.server
 app.title = "Kurumsal BIST 100 Dashboard"
 
-# Global theme toggle state (default dark)
 app.layout = html.Div([
     dcc.Store(id="theme-store", data="dark"),
+
+    # Tema geçiş düğmesi
     html.Div([
-        dbc.Switch(id="theme-toggle", label="Koyu Tema", value=True, className="form-check form-switch text-light")
+        dbc.Switch(id="theme-toggle", label="Koyu Tema", value=True,
+                   className="form-check form-switch text-light")
     ], style={"position": "fixed", "top": "10px", "right": "20px", "zIndex": 9999}),
+
+    # Mobil kart görünümü
     html.Div([
         html.H4("BIST 100 (Mobil Kart Görünümü)", className="text-light mt-4"),
         html.Div(id="mobile-cards-container")
-    ], style={"display": "none"}, id="mobile-view-container")
+    ], style={"display": "none"}, id="mobile-view-container"),
+
+    # Görünmeyen tablo (mobil kartlara veri kaynağı sağlıyor)
+    dash_table.DataTable(
+        id='overview-table',
+        columns=[
+            {'name': 'Sembol', 'id': 'Sembol'},
+            {'name': 'Şirket', 'id': 'Şirket'},
+            {'name': 'Fiyat', 'id': 'Fiyat'},
+            {'name': 'Değişim %', 'id': 'Değişim %'}
+        ],
+        data=[],  # Başlangıçta boş, ileride callback ile doldurulur
+        style_table={'display': 'none'}
+    )
 ])
 
-# Tema değiştirme callback
+# Tema toggle callback
 @app.callback(
     Output("theme-store", "data"),
     Input("theme-toggle", "value")
@@ -45,9 +54,7 @@ app.layout = html.Div([
 def toggle_theme(value):
     return "dark" if value else "light"
 
-# Mobil kart görünümü sadece küçük ekranlarda görünür
-
-
+# Mobil kart görünümü üretme
 @app.callback(
     Output("mobile-cards-container", "children"),
     Input("overview-table", "data")
@@ -57,20 +64,20 @@ def render_mobile_cards(data):
         return []
 
     cards = []
-    for row in data:  # Tüm hisseleri mobil kart görünümünde listele
+    for row in data:
         cards.append(
             dbc.Card([
                 dbc.CardBody([
                     html.H5(f"{row['Sembol']}", className="card-title"),
                     html.P(row['Şirket'], className="card-text small"),
                     html.P(f"Fiyat: {row['Fiyat']} TL", className="mb-1"),
-                    html.P(f"Değişim: {float(row['Değişim %']):+.2f}%%", className="mb-0")
+                    html.P(f"Değişim: {float(row['Değişim %']):+.2f}%", className="mb-0")
                 ])
             ], color="dark", outline=True, className="mb-3")
         )
     return cards
 
-# CSS ile sadece mobilde göster
+# Özel index_string ile responsive görünüm
 app.index_string = '''
 <!DOCTYPE html>
 <html>
@@ -103,6 +110,7 @@ app.index_string = '''
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 8050))
     app.run(host="0.0.0.0", port=port, debug=False)
+
 
 
 
